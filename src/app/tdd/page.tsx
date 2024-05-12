@@ -16,13 +16,17 @@ export default function Todos() {
 
   const [todos, setTodos] = useState<TodoProps[]>([]);
 
-  const handleAddTasks = (data: { title: string }) => {
+  const handleAddTask = (data: { title: string }) => {
     setTodos((prev) => [
       ...prev,
       { title: data.title, status: false, id: uuid() },
     ]);
     resetField("title");
     setFocus("title");
+  };
+
+  const handledeleteTask = (id: string) => {
+    setTodos((prev) => prev.filter((task) => task.id !== id));
   };
 
   return (
@@ -37,7 +41,7 @@ export default function Todos() {
             className="rounded-lg p-3 min-w-96 bg-gray-800 text-gray-100 outline-none border"
           />
           <ButtonComponent
-            onClick={() => handleSubmit(handleAddTasks)()}
+            onClick={() => handleSubmit(handleAddTask)()}
             value="Adicionar tarefa"
           />
         </div>
@@ -48,11 +52,17 @@ export default function Todos() {
               key={todo.id}
             >
               <li className="">{todo.title}</li>
-              <span
-                className={`p-1 w-6 h-6 rounded-full ${
-                  todo.status ? "bg-green-500" : "bg-red-600"
-                } `}
-              ></span>
+              <div className="flex items-center justify-center gap-2">
+                <span
+                  className={`p-1 w-2 h-2 rounded-full ${
+                    todo.status ? "bg-green-500" : "bg-red-600"
+                  } `}
+                ></span>
+                <ButtonComponent
+                  onClick={() => handledeleteTask(todo.id)}
+                  value="delete"
+                />
+              </div>
             </div>
           ))}
         </ul>

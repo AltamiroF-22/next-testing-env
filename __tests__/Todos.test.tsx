@@ -1,7 +1,7 @@
 // Importa o componente Todos da página de teste
 import Todos from "@/app/tdd/page";
 // Importa funções e métodos úteis para realizar testes
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 // Importa userEvent para simular eventos de usuário
 import userEvent from "@testing-library/user-event";
 
@@ -56,6 +56,30 @@ describe("Todos", () => {
     // Verifica se o campo de entrada está vazio após adicionar a tarefa
     screen.getByPlaceholderText(/Digite o nome da tarefa/i);
     // Verifica se o título da tarefa adicionada está sendo exibido corretamente
-    screen.getByText(taskTitle);
+    expect(screen.getAllByText(taskTitle)).toHaveLength(1);
+  });
+
+  it("Should delete task on delete click", async () => {
+    // Adiciona tarefa para deletar
+    render(<Todos />);
+
+    const input = screen.getByPlaceholderText(/Digite o nome da tarefa/i);
+
+    const taskTitle = "Nova tarefa";
+
+    await userEvent.type(input, taskTitle);
+
+    screen.getByDisplayValue(taskTitle);
+
+    const button = screen.getByRole("button", { name: /Adicionar tarefa/i });
+
+    await userEvent.click(button);
+
+    //deleta tarefa
+    const deleteBtn = screen.getByRole("button", { name: /delete/i });
+
+    await userEvent.click(deleteBtn);
+
+    expect(screen.queryByText(taskTitle)).not.toBeInTheDocument();
   });
 });
