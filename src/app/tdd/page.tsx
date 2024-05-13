@@ -12,21 +12,32 @@ export default function Todos() {
     formState: { errors },
     resetField,
     setFocus,
+    setValue,
   } = useForm<{ title: string }>();
 
   const [todos, setTodos] = useState<TodoProps[]>([]);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const handleAddTask = (data: { title: string }) => {
     setTodos((prev) => [
-      ...prev,
       { title: data.title, status: false, id: uuid() },
+      ...prev,
     ]);
     resetField("title");
     setFocus("title");
+    setIsEditing(false);
   };
 
   const handledeleteTask = (id: string) => {
     setTodos((prev) => prev.filter((task) => task.id !== id));
+  };
+
+  const handleEditFocusTask = (id: string) => {
+    setIsEditing(true);
+    const index = todos.findIndex((todo) => todo.id === id);
+    setValue("title", todos[index].title);
+    setFocus("title");
+    handledeleteTask(id);
   };
 
   return (
@@ -40,9 +51,10 @@ export default function Todos() {
             placeholder="Digite o nome da tarefa"
             className="rounded-lg p-3 min-w-96 bg-gray-800 text-gray-100 outline-none border"
           />
+
           <ButtonComponent
             onClick={() => handleSubmit(handleAddTask)()}
-            value="Adicionar tarefa"
+            value="Adicionar"
           />
         </div>
         <ul className="flex flex-col gap-3 mt-4">
@@ -58,10 +70,18 @@ export default function Todos() {
                     todo.status ? "bg-green-500" : "bg-red-600"
                   } `}
                 ></span>
+
                 <ButtonComponent
                   onClick={() => handledeleteTask(todo.id)}
-                  value="delete"
+                  value="deletar"
                 />
+
+                {!isEditing && (
+                  <ButtonComponent
+                    onClick={() => handleEditFocusTask(todo.id)}
+                    value="editar"
+                  />
+                )}
               </div>
             </div>
           ))}

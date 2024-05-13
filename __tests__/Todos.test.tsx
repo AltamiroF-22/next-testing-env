@@ -32,7 +32,7 @@ describe("Todos", () => {
     // Renderiza o componente Todos
     render(<Todos />);
     // Seleciona o botão pelo papel (role) e pelo nome
-    const button = screen.getByRole("button", { name: /Adicionar tarefa/i });
+    const button = screen.getByRole("button", { name: /Adicionar/i });
     // Verifica se o botão está no documento (DOM)
     expect(button).toBeInTheDocument();
   });
@@ -50,7 +50,7 @@ describe("Todos", () => {
     // Verifica se o valor digitado está sendo exibido corretamente no campo de entrada
     screen.getByDisplayValue(taskTitle);
     // Seleciona o botão de adicionar tarefa pelo papel (role) e pelo nome
-    const button = screen.getByRole("button", { name: /Adicionar tarefa/i });
+    const button = screen.getByRole("button", { name: /Adicionar/i });
     // Simula o clique no botão de adicionar tarefa
     await userEvent.click(button);
     // Verifica se o campo de entrada está vazio após adicionar a tarefa
@@ -71,15 +71,53 @@ describe("Todos", () => {
 
     screen.getByDisplayValue(taskTitle);
 
-    const button = screen.getByRole("button", { name: /Adicionar tarefa/i });
+    const button = screen.getByRole("button", { name: /Adicionar/i });
 
     await userEvent.click(button);
 
     //deleta tarefa
-    const deleteBtn = screen.getByRole("button", { name: /delete/i });
+    const deleteBtn = screen.getByRole("button", { name: /deletar/i });
 
     await userEvent.click(deleteBtn);
 
+    expect(screen.queryByText(taskTitle)).not.toBeInTheDocument();
+  });
+
+  it("Should edit task on edit click", async () => {
+    // Adiciona tarefa para editar
+    render(<Todos />);
+
+    const input = screen.getByPlaceholderText(/Digite o nome da tarefa/i);
+
+    const taskTitle = "Nova tarefa";
+
+    await userEvent.type(input, taskTitle);
+
+    screen.getByDisplayValue(taskTitle);
+
+    const addButton = screen.getByRole("button", { name: /Adicionar/i });
+
+    await userEvent.click(addButton);
+
+    // Seleciona o botão de edição da tarefa adicionada
+    const editBtn = screen.getByRole("button", { name: /editar/i });
+
+    await userEvent.click(editBtn);
+
+    // Seleciona o campo de entrada para editar o título da tarefa
+    const editInput = screen.getByDisplayValue(taskTitle);
+
+    const editedTask = "Task editada";
+
+    // Simula a edição do título da tarefa
+    await userEvent.clear(editInput);
+    await userEvent.type(editInput, editedTask);
+
+    // Clica no botão de adicionar tarefa para salvar a edição
+    await userEvent.click(addButton);
+
+    // Verifica se a tarefa editada está sendo exibida corretamente
+    expect(screen.getByText(editedTask)).toBeInTheDocument();
     expect(screen.queryByText(taskTitle)).not.toBeInTheDocument();
   });
 });
